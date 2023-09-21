@@ -1,0 +1,72 @@
+#include <SPI.h>
+#include <SD.h>
+
+//File imagenAscii;
+
+void setup() {
+  Serial.begin(9600);  // Configura la comunicación serial a 9600 baudios
+   while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
+ 
+  SPI.setModule(0);
+  Serial.print("Initializing SD card...");
+  pinMode(12, OUTPUT);
+
+  if (!SD.begin(12)) {
+    Serial.println("initialization failed!");
+    return;
+  }
+  Serial.println("initialization done.");
+
+}
+
+void loop() {
+  Serial.println("Seleccione una opción:");
+  Serial.println("1) Imprimir 'Caballo ajedrez'");
+  Serial.println("2) Imprimir 'MK Scorpion'");
+  Serial.println("3) Imprimir 'Poste de luz'");
+
+  while (!Serial.available()) {
+    // Espera a que el usuario ingrese una opción
+  }
+
+  int opcion = Serial.parseInt();  // Lee la opción ingresada por el usuario
+
+  // Realiza la acción correspondiente según la opción seleccionada
+  switch (opcion) {
+    case 1:
+      Serial.println("Caballo ajedrez");
+      mostrarImagen("Caballo.txt");
+      break;
+    case 2:
+      Serial.println("MK Scorpion");
+      mostrarImagen("Scorpion.txt");
+      break;
+    case 3:
+      Serial.println("Poste de luz");
+      mostrarImagen("Poste.txt");
+      break;
+    default:
+      Serial.println("Opción no válida.");
+      break;
+  }
+
+  // Limpia el búfer serial
+  while (Serial.available()) {
+    Serial.read();
+  }
+}
+
+void mostrarImagen(const char *nombreArchivo) {
+  File archivo = SD.open(nombreArchivo);
+
+  if (archivo) {
+    while (archivo.available()) {
+      Serial.write(archivo.read()); // Lee y envía el contenido del archivo al monitor serial
+    }
+    archivo.close();
+  } else {
+    Serial.println("Error al abrir el archivo.");
+  }
+}
